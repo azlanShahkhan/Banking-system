@@ -1,0 +1,1437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banking System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Auth Screens */
+    .auth-container {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .auth-form {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .auth-form h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #667eea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #764ba2;
+    }
+
+    .btn-secondary {
+      background-color: #999;
+      margin-left: 10px;
+    }
+
+    .btn-secondary:hover {
+      background-color: #666;
+    }
+
+    .btn-danger {
+      background-color: #e74c3c;
+    }
+
+    .btn-danger:hover {
+      background-color: #c0392b;
+    }
+
+    .btn-small {
+      padding: 5px 10px;
+      font-size: 12px;
+    }
+
+    .toggle-form {
+      margin-top: 15px;
+      text-align: center;
+      color: #666;
+    }
+
+    .toggle-form button {
+      background: none;
+      color: #667eea;
+      padding: 0;
+      margin: 0;
+      text-decoration: underline;
+    }
+
+    .error {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .success {
+      color: #27ae60;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .message {
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .message.error {
+      background-color: #fadbd8;
+      color: #922b21;
+    }
+
+    .message.success {
+      background-color: #d5f4e6;
+      color: #186a3b;
+    }
+
+    /* Dashboard */
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-header h1 {
+      color: #333;
+    }
+
+    .user-info {
+      text-align: right;
+      color: #666;
+    }
+
+    .user-info p {
+      margin: 3px 0;
+      font-size: 14px;
+    }
+
+    .logout-btn {
+      margin-top: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .tab-btn {
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      color: #999;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.3s;
+    }
+
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Accounts Section */
+    .accounts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .account-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .account-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .account-card.selected {
+      border: 3px solid #f39c12;
+    }
+
+    .account-card h3 {
+      margin-bottom: 10px;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .account-card .balance {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .account-card p {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    .add-account-btn {
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    /* Form Section */
+    .form-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .form-box {
+      background-color: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+
+    .form-box h3 {
+      margin-bottom: 15px;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .account-select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      font-size: 14px;
+    }
+
+    /* Transactions List */
+    .transactions-list {
+      margin-top: 20px;
+    }
+
+    .transaction-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #eee;
+      background-color: #f9f9f9;
+      margin-bottom: 10px;
+      border-radius: 5px;
+    }
+
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-info {
+      flex: 1;
+    }
+
+    .transaction-type {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .transaction-date {
+      font-size: 12px;
+      color: #999;
+      margin-top: 3px;
+    }
+
+    .transaction-amount {
+      font-size: 16px;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .transaction-amount.deposit {
+      color: #27ae60;
+    }
+
+    .transaction-amount.withdraw {
+      color: #e74c3c;
+    }
+
+    .transaction-amount.transfer-out {
+      color: #e74c3c;
+    }
+
+    .transaction-amount.transfer-in {
+      color: #27ae60;
+    }
+
+    /* Profile Section */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .profile-item {
+      background-color: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px solid #eee;
+    }
+
+    .profile-item label {
+      display: block;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .profile-item p {
+      color: #666;
+      font-size: 14px;
+    }
+
+    /* Admin Styles */
+    .admin-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s;
+      z-index: 1000;
+    }
+
+    .admin-button:hover {
+      transform: scale(1.1);
+    }
+
+    .admin-panel {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      color: white;
+    }
+
+    .admin-panel .card {
+      background: #0f3460;
+      color: white;
+    }
+
+    .admin-panel h1, .admin-panel h2, .admin-panel h3 {
+      color: white;
+    }
+
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      border-radius: 10px;
+      color: white;
+      text-align: center;
+    }
+
+    .stat-card h4 {
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+
+    .stat-card .stat-value {
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .admin-tables {
+      margin-top: 30px;
+    }
+
+    .admin-table-container {
+      margin-bottom: 30px;
+    }
+
+    .admin-table-container h3 {
+      margin-bottom: 15px;
+      color: white;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #0f3460;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #1a3a52;
+      color: white;
+    }
+
+    th {
+      background: #16213e;
+      font-weight: 600;
+      color: #667eea;
+    }
+
+    tr:hover {
+      background: #1a3a52;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .card {
+        padding: 20px;
+      }
+
+      .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .user-info {
+        text-align: left;
+        margin-top: 15px;
+      }
+
+      .form-section {
+        grid-template-columns: 1fr;
+      }
+
+      .tabs {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Auth Screen -->
+  <div id="authScreen" class="container">
+    <div class="card">
+      <div class="auth-container">
+        <div class="auth-form">
+          <h2>Login</h2>
+          <div id="loginMessage"></div>
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="loginUsername" placeholder="Enter username">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="loginPassword" placeholder="Enter password">
+          </div>
+          <button onclick="login()">Login</button>
+          <div class="toggle-form">
+            Don't have an account? <button onclick="toggleAuthForm()">Register here</button>
+          </div>
+        </div>
+
+        <div class="auth-form" id="registerForm" style="display: none;">
+          <h2>Register</h2>
+          <div id="registerMessage"></div>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="registerFullName" placeholder="Enter full name">
+          </div>
+          <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="registerUsername" placeholder="Enter username">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="registerEmail" placeholder="Enter email">
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="registerPassword" placeholder="Enter password">
+          </div>
+          <div class="form-group">
+            <label>Phone (Optional)</label>
+            <input type="tel" id="registerPhone" placeholder="Enter phone">
+          </div>
+          <div class="form-group">
+            <label>Address (Optional)</label>
+            <input type="text" id="registerAddress" placeholder="Enter address">
+          </div>
+          <button onclick="register()">Register</button>
+          <div class="toggle-form">
+            Already have an account? <button onclick="toggleAuthForm()">Login here</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Screen -->
+  <div id="adminScreen" class="container hidden">
+    <div class="card admin-panel">
+      <div class="dashboard-header">
+        <div>
+          <h1>Admin Dashboard</h1>
+        </div>
+        <div class="user-info">
+          <p>Admin: <strong id="adminName">Shadow-monarch</strong></p>
+          <button class="logout-btn" onclick="adminLogout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card admin-panel">
+      <h2>Dashboard Statistics</h2>
+      <div class="admin-stats">
+        <div class="stat-card">
+          <h4>Total Users</h4>
+          <div class="stat-value" id="statTotalUsers">0</div>
+        </div>
+        <div class="stat-card">
+          <h4>Total Accounts</h4>
+          <div class="stat-value" id="statTotalAccounts">0</div>
+        </div>
+        <div class="stat-card">
+          <h4>Total Balance</h4>
+          <div class="stat-value" id="statTotalBalance">$0</div>
+        </div>
+        <div class="stat-card">
+          <h4>Total Transactions</h4>
+          <div class="stat-value" id="statTotalTransactions">0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card admin-panel">
+      <div class="admin-tables">
+        <div class="admin-table-container">
+          <h3>Users</h3>
+          <table id="usersTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Phone</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="admin-table-container">
+          <h3>Accounts</h3>
+          <table id="accountsTable">
+            <thead>
+              <tr>
+                <th>Account ID</th>
+                <th>User</th>
+                <th>Account Number</th>
+                <th>Type</th>
+                <th>Balance</th>
+              </tr>
+            </thead>
+            <tbody id="accountsTableBody">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="admin-table-container">
+          <h3>Recent Transactions</h3>
+          <table id="transactionsTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Account</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsTableBody">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Login Modal -->
+  <div id="adminModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 2000;">
+    <div class="card" style="max-width: 400px;">
+      <h2>Admin Login</h2>
+      <div id="adminModalMessage"></div>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="adminModalName" placeholder="Enter admin name">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminModalPassword" placeholder="Enter password">
+      </div>
+      <button onclick="adminLoginSubmit()">Login as Admin</button>
+      <button class="btn-secondary" onclick="closeAdminModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Dashboard Screen -->
+  <div id="dashboardScreen" class="container hidden">
+    <div class="card">
+      <div class="dashboard-header">
+        <div>
+          <h1>Welcome to Banking System</h1>
+        </div>
+        <div class="user-info">
+          <p>User: <strong id="userFullName"></strong></p>
+          <p>Username: <strong id="userUsername"></strong></p>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('accounts')">Accounts</button>
+        <button class="tab-btn" onclick="switchTab('transactions')">Transactions</button>
+        <button class="tab-btn" onclick="switchTab('transfers')">Transfers</button>
+        <button class="tab-btn" onclick="switchTab('profile')">Profile</button>
+      </div>
+
+      <!-- Accounts Tab -->
+      <div id="accounts" class="tab-content active">
+        <h2>My Accounts</h2>
+        <div class="accounts-grid" id="accountsList"></div>
+        <button class="add-account-btn" onclick="showAddAccountModal()">+ Add New Account</button>
+
+        <div class="form-section">
+          <div class="form-box">
+            <h3>Deposit</h3>
+            <div class="form-group">
+              <label>Select Account</label>
+              <select id="depositAccount" class="account-select"></select>
+            </div>
+            <div class="form-group">
+              <label>Amount</label>
+              <input type="number" id="depositAmount" placeholder="0.00" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Description (Optional)</label>
+              <input type="text" id="depositDescription" placeholder="Enter description">
+            </div>
+            <button onclick="deposit()">Deposit</button>
+            <div id="depositMessage"></div>
+          </div>
+
+          <div class="form-box">
+            <h3>Withdraw</h3>
+            <div class="form-group">
+              <label>Select Account</label>
+              <select id="withdrawAccount" class="account-select"></select>
+            </div>
+            <div class="form-group">
+              <label>Amount</label>
+              <input type="number" id="withdrawAmount" placeholder="0.00" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Description (Optional)</label>
+              <input type="text" id="withdrawDescription" placeholder="Enter description">
+            </div>
+            <button onclick="withdraw()">Withdraw</button>
+            <div id="withdrawMessage"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transactions Tab -->
+      <div id="transactions" class="tab-content">
+        <h2>Transaction History</h2>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label>Select Account</label>
+          <select id="transactionAccount" class="account-select" onchange="loadTransactions()"></select>
+        </div>
+        <div id="transactionsList" class="transactions-list"></div>
+      </div>
+
+      <!-- Transfers Tab -->
+      <div id="transfers" class="tab-content">
+        <h2>Transfer Funds</h2>
+        <div class="form-section">
+          <div class="form-box">
+            <h3>Transfer Between Accounts</h3>
+            <div class="form-group">
+              <label>From Account</label>
+              <select id="transferFromAccount" class="account-select"></select>
+              <small style="color: #999; margin-top: 5px; display: block;">Your account to transfer from</small>
+            </div>
+            <div class="form-group">
+              <label>To Account (Account Number)</label>
+              <input type="text" id="transferToAccount" placeholder="e.g., ACC-123456789">
+              <small style="color: #999; margin-top: 5px; display: block;">Enter the recipient's account number</small>
+            </div>
+            <div class="form-group">
+              <label>Amount ($)</label>
+              <input type="number" id="transferAmount" placeholder="0.00" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+              <label>Description (Optional)</label>
+              <input type="text" id="transferDescription" placeholder="e.g., Payment, Loan, etc.">
+            </div>
+            <button onclick="transfer()" style="width: 100%;">Send Transfer</button>
+            <div id="transferMessage"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profile Tab -->
+      <div id="profile" class="tab-content">
+        <h2>My Profile</h2>
+        <div class="profile-grid" id="profileInfo"></div>
+        <button onclick="showEditProfileModal()" style="margin-top: 20px;">Edit Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Account Modal -->
+  <div id="addAccountModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;">
+    <div class="card" style="max-width: 400px;">
+      <h2>Create New Account</h2>
+      <div class="form-group">
+        <label>Account Type</label>
+        <select id="newAccountType" class="account-select">
+          <option value="Checking">Checking</option>
+          <option value="Savings">Savings</option>
+          <option value="Business">Business</option>
+        </select>
+      </div>
+      <button onclick="createAccount()">Create Account</button>
+      <button class="btn-secondary" onclick="closeAddAccountModal()">Cancel</button>
+      <div id="addAccountMessage"></div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="editProfileModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;">
+    <div class="card" style="max-width: 400px;">
+      <h2>Edit Profile</h2>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="editFullName">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="tel" id="editPhone">
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="editAddress">
+      </div>
+      <button onclick="updateProfile()">Save Changes</button>
+      <button class="btn-secondary" onclick="closeEditProfileModal()">Cancel</button>
+      <div id="editProfileMessage"></div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:5000/api';
+    let currentUser = null;
+    let selectedAccountId = null;
+    let accounts = [];
+
+    // AUTH FUNCTIONS
+    function login() {
+      const username = document.getElementById('loginUsername').value;
+      const password = document.getElementById('loginPassword').value;
+
+      if (!username || !password) {
+        showMessage('loginMessage', 'Please fill in all fields', 'error');
+        return;
+      }
+
+      fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showMessage('loginMessage', data.error, 'error');
+          } else {
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('userId', data.userId);
+            currentUser = { userId: data.userId, username: data.username, full_name: data.full_name };
+            showDashboard();
+          }
+        })
+        .catch(err => showMessage('loginMessage', 'Login failed', 'error'));
+    }
+
+    function register() {
+      const fullName = document.getElementById('registerFullName').value;
+      const username = document.getElementById('registerUsername').value;
+      const email = document.getElementById('registerEmail').value;
+      const password = document.getElementById('registerPassword').value;
+      const phone = document.getElementById('registerPhone').value;
+      const address = document.getElementById('registerAddress').value;
+
+      if (!fullName || !username || !email || !password) {
+        showMessage('registerMessage', 'Please fill in all required fields', 'error');
+        return;
+      }
+
+      fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password, full_name: fullName, phone, address })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showMessage('registerMessage', data.error, 'error');
+          } else {
+            showMessage('registerMessage', 'Registration successful! You can now login.', 'success');
+            setTimeout(() => toggleAuthForm(), 2000);
+          }
+        })
+        .catch(err => showMessage('registerMessage', 'Registration failed', 'error'));
+    }
+
+    function toggleAuthForm() {
+      const loginForm = document.querySelector('.auth-form');
+      const registerForm = document.getElementById('registerForm');
+      loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+      registerForm.style.display = registerForm.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      currentUser = null;
+      showAuthScreen();
+    }
+
+    // DASHBOARD FUNCTIONS
+    function showDashboard() {
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('dashboardScreen').classList.remove('hidden');
+      document.getElementById('userFullName').textContent = currentUser.full_name;
+      document.getElementById('userUsername').textContent = currentUser.username;
+      loadAccounts();
+      loadProfile();
+    }
+
+    function showAuthScreen() {
+      document.getElementById('dashboardScreen').classList.add('hidden');
+      document.getElementById('authScreen').classList.remove('hidden');
+      document.getElementById('loginUsername').value = '';
+      document.getElementById('loginPassword').value = '';
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tab).classList.add('active');
+      event.target.classList.add('active');
+
+      if (tab === 'transactions') loadTransactions();
+    }
+
+    // ACCOUNT FUNCTIONS
+    function loadAccounts() {
+      const token = localStorage.getItem('token');
+      fetch(`${API_URL}/accounts`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          accounts = data;
+          displayAccounts();
+          populateAccountSelects();
+        })
+        .catch(err => console.error('Error loading accounts:', err));
+    }
+
+    function displayAccounts() {
+      const accountsList = document.getElementById('accountsList');
+      accountsList.innerHTML = '';
+      accounts.forEach(account => {
+        const card = document.createElement('div');
+        card.className = 'account-card';
+        card.innerHTML = `
+          <h3>${account.account_type}</h3>
+          <div class="balance">$${account.balance.toFixed(2)}</div>
+          <p>Account #: ${account.account_number}</p>
+          <p>Account ID: ${account.id}</p>
+        `;
+        card.onclick = () => selectAccount(account.id);
+        accountsList.appendChild(card);
+      });
+    }
+
+    function populateAccountSelects() {
+      const selects = ['depositAccount', 'withdrawAccount', 'transferFromAccount', 'transactionAccount'];
+      selects.forEach(selectId => {
+        const select = document.getElementById(selectId);
+        select.innerHTML = '<option value="">Select account...</option>';
+        accounts.forEach(account => {
+          const option = document.createElement('option');
+          option.value = account.id;
+          option.textContent = `${account.account_type} - $${account.balance.toFixed(2)} (${account.account_number})`;
+          select.appendChild(option);
+        });
+      });
+    }
+
+    function selectAccount(accountId) {
+      selectedAccountId = accountId;
+      document.querySelectorAll('.account-card').forEach(el => el.classList.remove('selected'));
+      event.target.closest('.account-card').classList.add('selected');
+    }
+
+    function showAddAccountModal() {
+      document.getElementById('addAccountModal').style.display = 'flex';
+    }
+
+    function closeAddAccountModal() {
+      document.getElementById('addAccountModal').style.display = 'none';
+    }
+
+    function createAccount() {
+      const accountType = document.getElementById('newAccountType').value;
+      const token = localStorage.getItem('token');
+
+      fetch(`${API_URL}/accounts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ account_type: accountType })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showMessage('addAccountMessage', data.error, 'error');
+          } else {
+            showMessage('addAccountMessage', 'Account created successfully!', 'success');
+            setTimeout(() => {
+              closeAddAccountModal();
+              loadAccounts();
+            }, 1500);
+          }
+        })
+        .catch(err => showMessage('addAccountMessage', 'Failed to create account', 'error'));
+    }
+
+    // TRANSACTION FUNCTIONS
+    function deposit() {
+      const accountId = document.getElementById('depositAccount').value;
+      const amount = parseFloat(document.getElementById('depositAmount').value);
+      const description = document.getElementById('depositDescription').value;
+      const token = localStorage.getItem('token');
+
+      if (!accountId || !amount || amount <= 0) {
+        showMessage('depositMessage', 'Please enter valid details', 'error');
+        return;
+      }
+
+      fetch(`${API_URL}/transactions/deposit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ account_id: parseInt(accountId), amount, description })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showMessage('depositMessage', data.error, 'error');
+          } else {
+            showMessage('depositMessage', `Deposit successful! New balance: $${data.new_balance.toFixed(2)}`, 'success');
+            document.getElementById('depositAmount').value = '';
+            document.getElementById('depositDescription').value = '';
+            loadAccounts();
+          }
+        })
+        .catch(err => showMessage('depositMessage', 'Deposit failed', 'error'));
+    }
+
+    function withdraw() {
+      const accountId = document.getElementById('withdrawAccount').value;
+      const amount = parseFloat(document.getElementById('withdrawAmount').value);
+      const description = document.getElementById('withdrawDescription').value;
+      const token = localStorage.getItem('token');
+
+      if (!accountId || !amount || amount <= 0) {
+        showMessage('withdrawMessage', 'Please enter valid details', 'error');
+        return;
+      }
+
+      fetch(`${API_URL}/transactions/withdraw`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ account_id: parseInt(accountId), amount, description })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showMessage('withdrawMessage', data.error, 'error');
+          } else {
+            showMessage('withdrawMessage', `Withdrawal successful! New balance: $${data.new_balance.toFixed(2)}`, 'success');
+            document.getElementById('withdrawAmount').value = '';
+            document.getElementById('withdrawDescription').value = '';
+            loadAccounts();
+          }
+        })
+        .catch(err => showMessage('withdrawMessage', 'Withdrawal failed', 'error'));
+    }
+
+    function loadTransactions() {
+      const accountId = document.getElementById('transactionAccount').value;
+      const token = localStorage.getItem('token');
+
+      if (!accountId) return;
+
+      fetch(`${API_URL}/transactions/${accountId}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          const list = document.getElementById('transactionsList');
+          list.innerHTML = '';
+          if (data.length === 0) {
+            list.innerHTML = '<p style="text-align: center; color: #999;">No transactions yet</p>';
+            return;
+          }
+          data.forEach(tx => {
+            const item = document.createElement('div');
+            item.className = 'transaction-item';
+            const amountClass = tx.transaction_type.includes('Deposit') || tx.transaction_type === 'Transfer In' ? 'deposit' : tx.transaction_type.includes('Withdrawal') ? 'withdraw' : tx.transaction_type === 'Transfer Out' ? 'transfer-out' : 'transfer-in';
+            const amount = tx.transaction_type.includes('Withdrawal') || tx.transaction_type === 'Transfer Out' ? `-$${tx.amount.toFixed(2)}` : `+$${tx.amount.toFixed(2)}`;
+            item.innerHTML = `
+              <div class="transaction-info">
+                <div class="transaction-type">${tx.transaction_type}</div>
+                <div class="transaction-date">${new Date(tx.created_at).toLocaleDateString()} ${new Date(tx.created_at).toLocaleTimeString()}</div>
+              </div>
+              <div class="transaction-amount ${amountClass}">${amount}</div>
+            `;
+            list.appendChild(item);
+          });
+        })
+        .catch(err => console.error('Error loading transactions:', err));
+    }
+
+    // TRANSFER FUNCTIONS
+    function transfer() {
+      const fromAccountId = document.getElementById('transferFromAccount').value;
+      const toAccountNumber = document.getElementById('transferToAccount').value;
+      const amount = parseFloat(document.getElementById('transferAmount').value);
+      const description = document.getElementById('transferDescription').value;
+      const token = localStorage.getItem('token');
+
+      if (!fromAccountId || !toAccountNumber || !amount || amount <= 0) {
+        showMessage('transferMessage', 'Please enter all required fields', 'error');
+        return;
+      }
+
+      if (amount > 1000000) {
+        showMessage('transferMessage', 'Transfer amount cannot exceed $1,000,000', 'error');
+        return;
+      }
+
+      fetch(`${API_URL}/transfers`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ 
+          from_account_id: parseInt(fromAccountId), 
+          to_account_number: toAccountNumber, 
+          amount, 
+          description: description || 'Transfer' 
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showMessage('transferMessage', data.error, 'error');
+          } else {
+            showMessage('transferMessage', '✓ Transfer successful! Funds have been sent.', 'success');
+            document.getElementById('transferAmount').value = '';
+            document.getElementById('transferDescription').value = '';
+            document.getElementById('transferToAccount').value = '';
+            loadAccounts();
+            setTimeout(() => loadTransactions(), 1000);
+          }
+        })
+        .catch(err => showMessage('transferMessage', 'Transfer failed. Please try again.', 'error'));
+    }
+
+    // PROFILE FUNCTIONS
+    function loadProfile() {
+      const token = localStorage.getItem('token');
+      fetch(`${API_URL}/user/profile`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          displayProfile(data);
+        })
+        .catch(err => console.error('Error loading profile:', err));
+    }
+
+    function displayProfile(user) {
+      const profileInfo = document.getElementById('profileInfo');
+      profileInfo.innerHTML = `
+        <div class="profile-item">
+          <label>Full Name</label>
+          <p>${user.full_name}</p>
+        </div>
+        <div class="profile-item">
+          <label>Username</label>
+          <p>${user.username}</p>
+        </div>
+        <div class="profile-item">
+          <label>Email</label>
+          <p>${user.email}</p>
+        </div>
+        <div class="profile-item">
+          <label>Phone</label>
+          <p>${user.phone || 'Not provided'}</p>
+        </div>
+        <div class="profile-item">
+          <label>Address</label>
+          <p>${user.address || 'Not provided'}</p>
+        </div>
+        <div class="profile-item">
+          <label>Member Since</label>
+          <p>${new Date(user.created_at).toLocaleDateString()}</p>
+        </div>
+      `;
+      document.getElementById('editFullName').value = user.full_name;
+      document.getElementById('editPhone').value = user.phone || '';
+      document.getElementById('editAddress').value = user.address || '';
+    }
+
+    function showEditProfileModal() {
+      document.getElementById('editProfileModal').style.display = 'flex';
+    }
+
+    function closeEditProfileModal() {
+      document.getElementById('editProfileModal').style.display = 'none';
+    }
+
+    function updateProfile() {
+      const fullName = document.getElementById('editFullName').value;
+      const phone = document.getElementById('editPhone').value;
+      const address = document.getElementById('editAddress').value;
+      const token = localStorage.getItem('token');
+
+      fetch(`${API_URL}/user/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ full_name: fullName, phone, address })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showMessage('editProfileMessage', data.error, 'error');
+          } else {
+            showMessage('editProfileMessage', 'Profile updated successfully!', 'success');
+            setTimeout(() => {
+              closeEditProfileModal();
+              loadProfile();
+            }, 1500);
+          }
+        })
+        .catch(err => showMessage('editProfileMessage', 'Update failed', 'error'));
+    }
+
+    // UTILITY FUNCTIONS
+    function showMessage(elementId, message, type) {
+      const el = document.getElementById(elementId);
+      el.innerHTML = `<div class="message ${type}">${message}</div>`;
+      setTimeout(() => (el.innerHTML = ''), 5000);
+    }
+
+    // ADMIN FUNCTIONS
+    function showAdminButton() {
+      if (!document.getElementById('adminBtn')) {
+        const btn = document.createElement('button');
+        btn.id = 'adminBtn';
+        btn.className = 'admin-button';
+        btn.textContent = '⚙️';
+        btn.onclick = openAdminModal;
+        document.body.appendChild(btn);
+      }
+    }
+
+    function openAdminModal() {
+      document.getElementById('adminModal').style.display = 'flex';
+    }
+
+    function closeAdminModal() {
+      document.getElementById('adminModal').style.display = 'none';
+      document.getElementById('adminModalMessage').innerHTML = '';
+      document.getElementById('adminModalName').value = '';
+      document.getElementById('adminModalPassword').value = '';
+    }
+
+    function adminLoginSubmit() {
+      const name = document.getElementById('adminModalName').value;
+      const password = document.getElementById('adminModalPassword').value;
+
+      if (!name || !password) {
+        showMessage('adminModalMessage', 'Please fill in all fields', 'error');
+        return;
+      }
+
+      fetch(`${API_URL}/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, password })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showMessage('adminModalMessage', data.error, 'error');
+          } else {
+            localStorage.setItem('adminToken', data.token);
+            closeAdminModal();
+            showAdminDashboard();
+          }
+        })
+        .catch(err => showMessage('adminModalMessage', 'Login failed', 'error'));
+    }
+
+    function showAdminDashboard() {
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('dashboardScreen').classList.add('hidden');
+      document.getElementById('adminScreen').classList.remove('hidden');
+      loadAdminDashboard();
+    }
+
+    function adminLogout() {
+      localStorage.removeItem('adminToken');
+      document.getElementById('adminScreen').classList.add('hidden');
+      showAuthScreen();
+    }
+
+    function loadAdminDashboard() {
+      const token = localStorage.getItem('adminToken');
+      if (!token) return;
+
+      // Load dashboard stats
+      fetch(`${API_URL}/admin/dashboard`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('statTotalUsers').textContent = data.totalUsers;
+          document.getElementById('statTotalAccounts').textContent = data.totalAccounts;
+          document.getElementById('statTotalBalance').textContent = '$' + data.totalBalance.toFixed(2);
+          document.getElementById('statTotalTransactions').textContent = data.totalTransactions;
+        })
+        .catch(err => console.error('Error loading dashboard stats:', err));
+
+      // Load users
+      fetch(`${API_URL}/admin/users`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById('usersTableBody');
+          tbody.innerHTML = '';
+          data.forEach(user => {
+            const row = tbody.insertRow();
+            row.innerHTML = `
+              <td>${user.id}</td>
+              <td>${user.username}</td>
+              <td>${user.email}</td>
+              <td>${user.full_name}</td>
+              <td>${user.phone || '-'}</td>
+              <td>${new Date(user.created_at).toLocaleDateString()}</td>
+            `;
+          });
+        })
+        .catch(err => console.error('Error loading users:', err));
+
+      // Load accounts
+      fetch(`${API_URL}/admin/accounts`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById('accountsTableBody');
+          tbody.innerHTML = '';
+          data.forEach(account => {
+            const row = tbody.insertRow();
+            row.innerHTML = `
+              <td>${account.id}</td>
+              <td>${account.username}</td>
+              <td>${account.account_number}</td>
+              <td>${account.account_type}</td>
+              <td>$${account.balance.toFixed(2)}</td>
+            `;
+          });
+        })
+        .catch(err => console.error('Error loading accounts:', err));
+
+      // Load transactions
+      fetch(`${API_URL}/admin/transactions`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById('transactionsTableBody');
+          tbody.innerHTML = '';
+          data.slice(0, 20).forEach(tx => {
+            const row = tbody.insertRow();
+            row.innerHTML = `
+              <td>${tx.id}</td>
+              <td>${tx.account_number}</td>
+              <td>${tx.transaction_type}</td>
+              <td>$${tx.amount.toFixed(2)}</td>
+              <td>${new Date(tx.created_at).toLocaleDateString()}</td>
+            `;
+          });
+        })
+        .catch(err => console.error('Error loading transactions:', err));
+    }
+
+    // Check if user is already logged in
+    window.addEventListener('load', () => {
+      showAdminButton();
+      
+      const adminToken = localStorage.getItem('adminToken');
+      if (adminToken) {
+        showAdminDashboard();
+        return;
+      }
+
+      const token = localStorage.getItem('token');
+      const userId = localStorage.getItem('userId');
+      if (token && userId) {
+        currentUser = { userId };
+        fetch(`${API_URL}/user/profile`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+          .then(res => res.json())
+          .then(data => {
+            currentUser = { userId, username: data.username, full_name: data.full_name };
+            showDashboard();
+          });
+      }
+    });
+  </script>
+</body>
+</html>
